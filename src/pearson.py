@@ -16,9 +16,3 @@ def pearson (i, j):
       second_denom += (element_j - media_j) ** 2
   
   return (numerator / ((first_denom ** 0.5) * (second_denom ** 0.5)))
-
-
-    
-
-
-  
