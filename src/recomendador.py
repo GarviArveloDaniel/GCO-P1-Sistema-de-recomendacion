@@ -85,12 +85,12 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
     numerador = 0
     denominador = 0
     for vecino in vecinos:
-        if matriz[vecino][item] != '-':
-            numerador += similitudes[usuario][vecino] * matriz[vecino][item]
-            denominador += abs(similitudes[usuario][vecino])
+        if vecino < len(matriz) and item < len(matriz[vecino]):  # Verificar que los índices sean válidos
+            if matriz[vecino][item] != '-':
+                numerador += similitudes[usuario][vecino] * matriz[vecino][item]
+                denominador += abs(similitudes[usuario][vecino])
     
     return numerador / denominador if denominador != 0 else 0
-
 
 def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
     """
