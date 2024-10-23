@@ -113,9 +113,10 @@ def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
     
     for vecino in vecinos:
         media_vecino = sum([v for v in matriz[vecino] if v != '-']) / len([v for v in matriz[vecino] if v != '-'])
-        if matriz[vecino][item] != '-':
-            numerador += similitudes[usuario][vecino] * (matriz[vecino][item] - media_vecino)
-            denominador += abs(similitudes[usuario][vecino])
+        if vecino < len(matriz) and item < len(matriz[vecino]):  # Verificar que los índices sean válidos
+            if matriz[vecino][item] != '-':
+                numerador += similitudes[usuario][vecino] * (matriz[vecino][item] - media_vecino)
+                denominador += abs(similitudes[usuario][vecino])
     
     return media_usuario + numerador / denominador if denominador != 0 else media_usuario
 
