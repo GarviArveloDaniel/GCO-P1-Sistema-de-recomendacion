@@ -142,23 +142,24 @@ def imprimir_resultados(matriz, matriz_similitud, vecinos):
         print(f"Usuario {i}: Vecinos {v}")
 
 
+# EJEMPLO DE EJECUCION: python3 recomendador.py --archivo matriz.txt --metrica euclidea --vecinos 3 --tipo_prediccion media
 
 def main():
     # Configurar el analizador de argumentos
     parser = argparse.ArgumentParser(description='Sistema de recomendación basado en diferentes métricas y tipos de predicción.')
-    parser.add_argument('--archivo', type=str, help='Ruta al archivo de la matriz de utilidad')
-    parser.add_argument('--metrica', type=str, choices=['pearson', 'coseno', 'euclidea'], help='Métrica elegida: pearson, coseno o euclidea')
-    parser.add_argument('--k', type=int, help='Número de vecinos considerado')
-    parser.add_argument('--tipo_prediccion', type=str, choices=['simple', 'media'], help='Tipo de predicción: simple o media')
+    parser.add_argument('--archivo', type=str, required=True, help='Ruta al archivo de la matriz de utilidad')
+    parser.add_argument('--metrica', type=str, required=True, choices=['pearson', 'coseno', 'euclidea'], help='Métrica elegida: pearson, coseno o euclidea')
+    parser.add_argument('--vecinos', type=int, required=True, help='Número de vecinos considerado')
+    parser.add_argument('--tipo_prediccion', type=str, required=True, choices=['simple', 'media'], help='Tipo de predicción: simple o media')
 
     # Parsear los argumentos
     args = parser.parse_args()
 
-    # Solicitar entrada del usuario si los argumentos no están presentes
-    archivo = args.archivo if args.archivo else input('Ingrese la ruta al archivo de la matriz de utilidad: ')
-    metrica = args.metrica if args.metrica else input('Ingrese la métrica elegida (pearson, coseno, euclidea): ')
-    k = args.k if args.k else int(input('Ingrese el número de vecinos considerado: '))
-    tipo_prediccion = args.tipo_prediccion if args.tipo_prediccion else input('Ingrese el tipo de predicción (simple, media): ')
+    # Asignar los argumentos a variables
+    archivo = args.archivo
+    metrica = args.metrica
+    k = args.vecinos
+    tipo_prediccion = args.tipo_prediccion
 
     # Cargar la matriz de utilidad
     matriz = cargar_matriz_utilidad(archivo)
