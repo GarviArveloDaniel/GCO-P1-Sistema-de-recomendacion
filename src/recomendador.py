@@ -1,6 +1,7 @@
 from cosine import coseno_similitud
 from euclidea import similitud_euclidea
 from pearson import pearson
+import argparse
 
 
 def cargar_matriz_utilidad(archivo):
@@ -107,17 +108,21 @@ def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
     Returns:
         float: Predicción de la calificación.
     """
-    media_usuario = sum([v for v in matriz[usuario] if v != '-']) / len([v for v in matriz[usuario] if v != '-'])
     numerador = 0
     denominador = 0
+    media_usuario = sum([x for x in matriz[usuario] if x != '-']) / len([x for x in matriz[usuario] if x != '-'])
     
     for vecino in vecinos:
-        media_vecino = sum([v for v in matriz[vecino] if v != '-']) / len([v for v in matriz[vecino] if v != '-'])
-        if matriz[vecino][item] != '-':
-            numerador += similitudes[usuario][vecino] * (matriz[vecino][item] - media_vecino)
-            denominador += abs(similitudes[usuario][vecino])
+        if vecino < len(matriz) and item < len(matriz[vecino]):  # Verificar que los índices sean válidos
+            if matriz[vecino][item] != '-':
+                media_vecino = sum([x for x in matriz[vecino] if x != '-']) / len([x for x in matriz[vecino] if x != '-'])
+                numerador += similitudes[usuario][vecino] * (matriz[vecino][item] - media_vecino)
+                denominador += abs(similitudes[usuario][vecino])
     
-    return media_usuario + numerador / denominador if denominador != 0 else media_usuario
+    if denominador == 0:
+        return media_usuario  # Evitar división por cero
+    
+    return media_usuario + (numerador / denominador)
 
 
 def imprimir_resultados(matriz, matriz_similitud, vecinos):
@@ -137,14 +142,29 @@ def imprimir_resultados(matriz, matriz_similitud, vecinos):
         print(f"Usuario {i}: Vecinos {v}")
 
 
+
 def main():
-    archivo = 'matriz.txt'  # Ruta al archivo de la matriz de utilidad
-    metrica = 'pearson'  # Cambiar por 'coseno' o 'euclidea'
-    k = 3  # Número de vecinos
-    tipo_prediccion = 'simple'  # 'simple' o 'media'
-    
+    # Configurar el analizador de argumentos
+    parser = argparse.ArgumentParser(description='Sistema de recomendación basado en diferentes métricas y tipos de predicción.')
+    parser.add_argument('--archivo', type=str, help='Ruta al archivo de la matriz de utilidad')
+    parser.add_argument('--metrica', type=str, choices=['pearson', 'coseno', 'euclidea'], help='Métrica elegida: pearson, coseno o euclidea')
+    parser.add_argument('--k', type=int, help='Número de vecinos considerado')
+    parser.add_argument('--tipo_prediccion', type=str, choices=['simple', 'media'], help='Tipo de predicción: simple o media')
+
+    # Parsear los argumentos
+    args = parser.parse_args()
+
+    # Solicitar entrada del usuario si los argumentos no están presentes
+    archivo = args.archivo if args.archivo else input('Ingrese la ruta al archivo de la matriz de utilidad: ')
+    metrica = args.metrica if args.metrica else input('Ingrese la métrica elegida (pearson, coseno, euclidea): ')
+    k = args.k if args.k else int(input('Ingrese el número de vecinos considerado: '))
+    tipo_prediccion = args.tipo_prediccion if args.tipo_prediccion else input('Ingrese el tipo de predicción (simple, media): ')
+
+    # Cargar la matriz de utilidad
     matriz = cargar_matriz_utilidad(archivo)
+    # Calcular la matriz de similitud
     matriz_similitud = calcular_similitud_matriz(matriz, metrica)
+    # Seleccionar los vecinos
     vecinos = seleccionar_vecinos(matriz_similitud, k)
     
     # Predecir valores faltantes
@@ -156,6 +176,7 @@ def main():
                 elif tipo_prediccion == 'media':
                     matriz[usuario][item] = prediccion_con_media(usuario, vecinos[usuario], matriz, matriz_similitud, item)
     
+    # Imprimir los resultados
     imprimir_resultados(matriz, matriz_similitud, vecinos)
 
 if __name__ == "__main__":

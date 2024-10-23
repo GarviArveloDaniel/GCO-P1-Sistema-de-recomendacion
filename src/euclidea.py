@@ -15,8 +15,10 @@ def similitud_euclidea(usuario1, usuario2):
     Retorna:
     float: Similitud entre los dos usuarios (inversamente proporcional a la distancia).
     """
-    if len(usuario1) != len(usuario2):
-        raise ValueError("Las listas deben tener la misma longitud")
+    # Asegurarse de que las listas tengan la misma longitud rellenando con '-'
+    max_len = max(len(usuario1), len(usuario2))
+    usuario1.extend(['-'] * (max_len - len(usuario1)))
+    usuario2.extend(['-'] * (max_len - len(usuario2)))
     
     # Calcular la suma de los cuadrados de las diferencias para ítems calificados
     suma_cuadrados = 0
@@ -30,10 +32,11 @@ def similitud_euclidea(usuario1, usuario2):
     if items_comunes == 0:
         return 0
     
-    # Calcular la distancia Euclídea y luego la similitud
+    # Calcular la distancia euclídea
     distancia = math.sqrt(suma_cuadrados)
+    
+    # Retornar la similitud (inversamente proporcional a la distancia)
     return 1 / (1 + distancia)
-
 
 '''
 # Ejemplo de uso de la función euclidean_distance con guiones
