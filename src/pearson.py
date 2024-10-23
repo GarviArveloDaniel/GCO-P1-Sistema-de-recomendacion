@@ -15,4 +15,6 @@ def pearson (i, j):
       first_denom += (element_i - media_i) ** 2
       second_denom += (element_j - media_j) ** 2
   
-  return (numerator / ((first_denom ** 0.5) * (second_denom ** 0.5)))
+  denom = (first_denom ** 0.5) * (second_denom ** 0.5)
+
+  return (numerator / denom) if denom != 0 else 0
