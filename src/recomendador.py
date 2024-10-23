@@ -15,6 +15,9 @@ def cargar_matriz_utilidad(archivo):
         list: Matriz de utilidad con calificaciones de usuarios.
     """
     with open(archivo, 'r') as f:
+        # Las dos primeras filas del fichero las ignoramos
+        f.readline()
+        f.readline()
         matriz = [line.strip().split() for line in f.readlines()]
         # Convertir los elementos a float o mantener el "-" para faltantes
         matriz = [[float(x) if x != '-' else '-' for x in fila] for fila in matriz]
