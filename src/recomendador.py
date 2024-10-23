@@ -22,7 +22,6 @@ def cargar_matriz_utilidad(archivo):
         matriz = [line.strip().split() for line in f.readlines()]
         # Convertir los elementos a float o mantener el "-" para faltantes
         matriz = [[float(x) if x != '-' else '-' for x in fila] for fila in matriz]
-        print(matriz)
     return matriz
 
 
@@ -71,7 +70,6 @@ def seleccionar_vecinos(similitudes, k):
         vecinos_ordenados = sorted([(j, sim_j) for j, sim_j in enumerate(sim) if j != i], key=lambda x: x[1], reverse=True)
         # Seleccionar los k vecinos más cercanos
         vecinos.append([vecino[0] for vecino in vecinos_ordenados[:k]])
-        print(vecinos)
     return vecinos
 
 
