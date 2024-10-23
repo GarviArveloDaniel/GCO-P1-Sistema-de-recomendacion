@@ -7,3 +7,13 @@ Primera práctica de la asignatura GCO: Sistema de recomendación
 - Daniel Garvi Arvelo
 - Guillermo Díaz Bricio
 - Alexander Morales Díaz
+
+# Introducción
+
+# Dependencias 
+
+
+# Explicación del código implementado
+
+
+# Ejemplos de uso de la aplicación
