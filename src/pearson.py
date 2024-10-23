@@ -1,4 +1,14 @@
 def pearson (i, j):
+  """
+    Calcula la correlación de Pearson entre dos listas de calificaciones.
+    
+    Args:
+        i (list): Lista de calificaciones del primer usuario.
+        j (list): Lista de calificaciones del segundo usuario.
+    
+    Returns:
+        float: Correlación de Pearson entre las dos listas de calificaciones.
+  """
   valid_i = [element for element in i if element != "-"]
   valid_j = [element for element in j if element != "-"]
 

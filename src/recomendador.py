@@ -92,6 +92,7 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
     
     return numerador / denominador if denominador != 0 else 0
 
+
 def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
     """
     Predice la calificación faltante de un usuario para un ítem, usando la diferencia con la media.
