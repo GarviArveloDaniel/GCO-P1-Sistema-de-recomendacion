@@ -529,3 +529,33 @@ Argumentos de entrada:
 --tipo_prediccion: Tipo de predicción a realizar, ya sea simple o media.
 
 # Ejemplos de uso de la aplicación
+
+## Ejemplo 1 --> Usando la métrica de similitud de Pearson y tipo de predicción media.
+```bash
+python3 recomendador.py --archivo matriz.txt --metrica pearson --vecinos 3 --tipo_prediccion media
+```
+
+## Ejemplo 2 --> Usando la métrica de similitud coseno y tipo de predicción media.
+```bash
+python3 recomendador.py --archivo matriz.txt --metrica coseno --vecinos 3 --tipo_prediccion media
+```
+
+## Ejemplo 3 --> sando la métrica de similitud euclidea y tipo de predicción media.
+```bash
+python3 recomendador.py --archivo matriz.txt --metrica euclidea --vecinos 3 --tipo_prediccion media
+```
+
+## Ejemplo 4 --> Usando la métrica de similitud de Pearson con predicción simple
+```bash
+python3 recomendador.py --archivo matriz.txt --metrica pearson --vecinos 3 --tipo_prediccion simple
+```
+
+## Ejemplo 5 --> Usando la métrica de similitud coseno con predicción simple.
+```bash
+python3 recomendador.py --archivo matriz.txt --metrica coseno --vecinos 3 --tipo_prediccion simple
+```
+
+## Ejemplo 6 --> Usando la métrica de similitud euclidea con predicción simple
+```bash
+python3 recomendador.py --archivo matriz.txt --metrica euclidea --vecinos 3 --tipo_prediccion simple
+```
