@@ -96,9 +96,9 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item, min_val):
             if matriz[vecino][item] != '-':
                 numerador += similitudes[usuario][vecino] * matriz[vecino][item]
                 denominador += abs(similitudes[usuario][vecino])
-                if (denominador == 0):
-                    return min_val
-                
+    
+    if (denominador == 0):
+        return min_val        
     return (numerador / denominador) if (numerador / denominador) >= min_val else min_val
 
 
