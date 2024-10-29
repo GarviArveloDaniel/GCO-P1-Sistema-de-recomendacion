@@ -17,12 +17,12 @@ def cargar_matriz_utilidad(archivo):
     """
     with open(archivo, 'r') as f:
         # Las dos primeras filas del fichero las ignoramos
-        f.readline()
-        f.readline()
+        min_val = f.readline()
+        max_val = f.readline()
         matriz = [line.strip().split() for line in f.readlines()]
         # Convertir los elementos a float o mantener el "-" para faltantes
         matriz = [[float(x) if x != '-' else '-' for x in fila] for fila in matriz]
-    return matriz
+    return matriz, float(min_val), float(max_val)
 
 
 
@@ -73,7 +73,7 @@ def seleccionar_vecinos(similitudes, k):
     return vecinos
 
 
-def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
+def prediccion_simple(usuario, vecinos, matriz, similitudes, item, min_val):
     """
     Predice la calificación faltante de un usuario para un ítem, usando predicción simple.
     
@@ -83,6 +83,8 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
         matriz (list): Matriz de utilidad con calificaciones de usuarios.
         similitudes (list): Matriz de similitud entre usuarios.
         item (int): Índice del ítem a predecir.
+        min_val (float): Valor mínimo de calificación.
+        max_val (float): Valor máximo de calificación.
     
     Returns:
         float: Predicción de la calificación.
@@ -94,11 +96,13 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
             if matriz[vecino][item] != '-':
                 numerador += similitudes[usuario][vecino] * matriz[vecino][item]
                 denominador += abs(similitudes[usuario][vecino])
-    
-    return numerador / denominador if denominador != 0 else 0
+                if (denominador == 0):
+                    return min_val
+                
+    return (numerador / denominador) if (numerador / denominador) >= min_val else min_val
 
 
-def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
+def prediccion_con_media(usuario, vecinos, matriz, similitudes, item, min_val):
     """
     Predice la calificación faltante de un usuario para un ítem, usando la diferencia con la media.
     
@@ -124,9 +128,9 @@ def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
                 denominador += abs(similitudes[usuario][vecino])
     
     if denominador == 0:
-        return media_usuario  # Evitar división por cero
+        return media_usuario  # Evitar división por cero)
     
-    return media_usuario + (numerador / denominador)
+    return (media_usuario + (numerador / denominador)) if (media_usuario + (numerador / denominador)) >= min_val else min_val
 
 
 def imprimir_resultados(matriz, matriz_similitud, vecinos):
@@ -166,7 +170,8 @@ def main():
     tipo_prediccion = args.tipo_prediccion
 
     # Cargar la matriz de utilidad
-    matriz = cargar_matriz_utilidad(archivo)
+    matriz, min_val, max_val = cargar_matriz_utilidad(archivo)
+    
     # Calcular la matriz de similitud
     matriz_similitud = calcular_similitud_matriz(matriz, metrica)
     # Seleccionar los vecinos
@@ -177,9 +182,9 @@ def main():
         for item in range(len(matriz[usuario])):
             if matriz[usuario][item] == '-':
                 if tipo_prediccion == 'simple':
-                    matriz[usuario][item] = prediccion_simple(usuario, vecinos[usuario], matriz, matriz_similitud, item)
+                    matriz[usuario][item] = prediccion_simple(usuario, vecinos[usuario], matriz, matriz_similitud, item, min_val)
                 elif tipo_prediccion == 'media':
-                    matriz[usuario][item] = prediccion_con_media(usuario, vecinos[usuario], matriz, matriz_similitud, item)
+                    matriz[usuario][item] = prediccion_con_media(usuario, vecinos[usuario], matriz, matriz_similitud, item, min_val)
     
     # Imprimir los resultados
     imprimir_resultados(matriz, matriz_similitud, vecinos)
