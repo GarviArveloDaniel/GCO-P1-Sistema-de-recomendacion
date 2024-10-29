@@ -2,6 +2,7 @@ from cosine import coseno_similitud
 from euclidea import similitud_euclidea
 from pearson import pearson
 import argparse
+from colorama import Fore, Style, init
 
 
 
@@ -99,7 +100,7 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item, min_val):
     
     if (denominador == 0):
         return min_val        
-    return (numerador / denominador) if (numerador / denominador) >= min_val else min_val
+    return round((numerador / denominador), 2) if (numerador / denominador) >= min_val else min_val
 
 
 def prediccion_con_media(usuario, vecinos, matriz, similitudes, item, min_val):
@@ -130,16 +131,23 @@ def prediccion_con_media(usuario, vecinos, matriz, similitudes, item, min_val):
     if denominador == 0:
         return media_usuario  # Evitar división por cero)
     
-    return (media_usuario + (numerador / denominador)) if (media_usuario + (numerador / denominador)) >= min_val else min_val
+    return round((media_usuario + (numerador / denominador)), 2) if (media_usuario + (numerador / denominador)) >= min_val else min_val
 
-
-def imprimir_resultados(matriz, matriz_similitud, vecinos):
+# Inicializar colorama
+init()
+def imprimir_resultados(matriz, matriz_similitud, vecinos, predicciones):
     """
     Imprime la matriz de utilidad con las predicciones, las similitudes y los vecinos seleccionados.
     """
     print("Matriz de utilidad con predicciones:")
-    for fila in matriz:
-        print(fila)
+    for i, fila in enumerate(matriz):
+        print("[", end=" ")
+        for j, valor in enumerate(fila):
+            if (i, j, valor) in predicciones:
+                print(Fore.RED + str(valor) + Style.RESET_ALL, end=" ")
+            else:
+                print(valor, end=" ")
+        print("]")
     
     print("\nMatriz de similitudes:")
     for fila in matriz_similitud:
@@ -148,6 +156,10 @@ def imprimir_resultados(matriz, matriz_similitud, vecinos):
     print("\nVecinos seleccionados para cada usuario:")
     for i, v in enumerate(vecinos):
         print(f"Usuario {i}: Vecinos {v}")
+
+    print("\nPredicciones de valoraciones de usuarios:")
+    for usuario, item, prediccion in predicciones:
+        print(f"Usuario {usuario} - Ítem {item}: {prediccion}")
 
 
 # EJEMPLO DE EJECUCION: python3 recomendador.py --archivo matriz.txt --metrica euclidea --vecinos 3 --tipo_prediccion media
@@ -176,6 +188,8 @@ def main():
     matriz_similitud = calcular_similitud_matriz(matriz, metrica)
     # Seleccionar los vecinos
     vecinos = seleccionar_vecinos(matriz_similitud, k)
+    # Lista para guardar únicamente las predicciones
+    predicciones = []
     
     # Predecir valores faltantes
     for usuario in range(len(matriz)):
@@ -185,9 +199,9 @@ def main():
                     matriz[usuario][item] = prediccion_simple(usuario, vecinos[usuario], matriz, matriz_similitud, item, min_val)
                 elif tipo_prediccion == 'media':
                     matriz[usuario][item] = prediccion_con_media(usuario, vecinos[usuario], matriz, matriz_similitud, item, min_val)
-    
+                predicciones.append((usuario, item, matriz[usuario][item]))
     # Imprimir los resultados
-    imprimir_resultados(matriz, matriz_similitud, vecinos)
+    imprimir_resultados(matriz, matriz_similitud, vecinos, predicciones)
 
 if __name__ == "__main__":
     main()
