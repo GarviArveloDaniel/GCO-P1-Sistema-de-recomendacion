@@ -155,10 +155,10 @@ def imprimir_resultados(matriz, matriz_similitud, vecinos):
 def main():
     # Configurar el analizador de argumentos
     parser = argparse.ArgumentParser(description='Sistema de recomendación basado en diferentes métricas y tipos de predicción.')
-    parser.add_argument('--archivo', type=str, required=True, help='Ruta al archivo de la matriz de utilidad')
-    parser.add_argument('--metrica', type=str, required=True, choices=['pearson', 'coseno', 'euclidea'], help='Métrica elegida: pearson, coseno o euclidea')
-    parser.add_argument('--vecinos', type=int, required=True, help='Número de vecinos considerado')
-    parser.add_argument('--tipo_prediccion', type=str, required=True, choices=['simple', 'media'], help='Tipo de predicción: simple o media')
+    parser.add_argument('-a', '--archivo', type=str, required=True, help='Ruta al archivo de la matriz de utilidad')
+    parser.add_argument('-m', '--metrica', type=str, required=True, choices=['pearson', 'coseno', 'euclidea'], help='Métrica elegida: pearson, coseno o euclidea')
+    parser.add_argument('-v', '--vecinos', type=int, required=True, help='Número de vecinos considerado')
+    parser.add_argument('-t', '--tipo_prediccion', type=str, required=True, choices=['simple', 'media'], help='Tipo de predicción: simple o media')
 
     # Parsear los argumentos
     args = parser.parse_args()
