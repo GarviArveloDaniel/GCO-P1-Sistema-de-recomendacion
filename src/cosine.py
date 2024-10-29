@@ -1,6 +1,16 @@
 import math
 
 def coseno_similitud(u, v):
+  """
+    Calcula la similitud coseno entre dos listas de valoraciones.
+    
+    Args:
+        u (list): Lista de calificaciones del primer usuario.
+        v (list): Lista de calificaciones del segundo usuario.
+    
+    Returns:
+        float: Correlación de coseno entre las dos listas de calificaciones.
+  """
   # Inicializar variables para los sumatorios
   sum_uu = 0
   sum_vv = 0
@@ -30,12 +40,3 @@ def coseno_similitud(u, v):
     return 0  # Evitar división por 0
     
   return sum_uv / denom
-
-'''
-# Ejemplo de uso
-usuario_1 = [3.0, 1.0, '-', 5.0, 4.0]
-usuario_2 = [4.0, '-', 3.0, 5.0, '-']
-
-similitud = coseno_similitud(usuario_1, usuario_2)
-print("Similitud coseno:", similitud)
-'''

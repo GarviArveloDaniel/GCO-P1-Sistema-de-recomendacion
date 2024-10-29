@@ -1,6 +1,6 @@
 def pearson (i, j):
   """
-    Calcula la correlación de Pearson entre dos listas de calificaciones.
+    Calcula la correlación de Pearson entre dos listas de valoraciones.
     
     Args:
         i (list): Lista de calificaciones del primer usuario.

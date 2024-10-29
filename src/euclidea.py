@@ -38,11 +38,3 @@ def similitud_euclidea(usuario1, usuario2):
     # Retornar la similitud (inversamente proporcional a la distancia)
     return 1 / (1 + distancia)
 
-'''
-# Ejemplo de uso de la función euclidean_distance con guiones
-user_a = [5.0, 3.0, '-', 4.0]
-user_b = [1.0, -1, 4.0, 2.0]
-
-similitud = similitud_euclidea(user_a, user_b)
-print(f"Similitud Euclídea: {similitud}")
-''' 
