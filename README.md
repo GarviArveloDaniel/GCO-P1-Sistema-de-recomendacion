@@ -104,6 +104,16 @@ El sistema de recomendación consta de varios módulos, cada uno responsable de 
 import math
 
 def coseno_similitud(u, v):
+  """
+    Calcula la similitud coseno entre dos listas de valoraciones.
+    
+    Args:
+        u (list): Lista de calificaciones del primer usuario.
+        v (list): Lista de calificaciones del segundo usuario.
+    
+    Returns:
+        float: Correlación de coseno entre las dos listas de calificaciones.
+  """
   # Inicializar variables para los sumatorios
   sum_uu = 0
   sum_vv = 0
@@ -133,18 +143,9 @@ def coseno_similitud(u, v):
     return 0  # Evitar división por 0
     
   return sum_uv / denom
-
-'''
-# Ejemplo de uso
-usuario_1 = [3.0, 1.0, '-', 5.0, 4.0]
-usuario_2 = [4.0, '-', 3.0, 5.0, '-']
-
-similitud = coseno_similitud(usuario_1, usuario_2)
-print("Similitud coseno:", similitud)
-'''
 ```
 
-La función `coseno_similitud(u, v)` calcula la similitud entre dos usuarios o ítems basándose en sus valoraciones, usando la métrica de similitud coseno. Esta técnica es común en sistemas de recomendación, ya que permite medir cuánto se parecen dos vectores analizando el ángulo entre ellos en un espacio n-dimensional.
+La función `coseno_similitud(u, v)` calcula la similitud entre dos usuarios o ítems basándose en sus valoraciones de una serie de items, usando la métrica de similitud coseno. Esta técnica es común en sistemas de recomendación, ya que permite medir cuánto se parecen dos vectores analizando el ángulo entre ellos en un espacio n-dimensional.
 
 
 1. **Explicación de la Función**
@@ -167,10 +168,6 @@ La función `coseno_similitud(u, v)` calcula la similitud entre dos usuarios o �
 
 ### euclidea.py
 ```bash
-
-# MÉTRICA EUCLIDEA. 
-# -*- coding: utf-8 -*-
-
 # libreria math para operaciones matemáticas, en este caso para poder calcular la raíz cuadrada
 import math
 
@@ -208,15 +205,6 @@ def similitud_euclidea(usuario1, usuario2):
     # Retornar la similitud (inversamente proporcional a la distancia)
     return 1 / (1 + distancia)
 
-'''
-# Ejemplo de uso de la función euclidean_distance con guiones
-user_a = [5.0, 3.0, '-', 4.0]
-user_b = [1.0, -1, 4.0, 2.0]
-
-similitud = similitud_euclidea(user_a, user_b)
-print(f"Similitud Euclídea: {similitud}")
-''' 
-
 ```
 
 La función `similitud_euclidea(usuario1, usuario2)` mide la similitud entre dos usuarios utilizando la distancia euclídea entre sus valoraciones. Esta métrica es especialmente útil en sistemas de recomendación, ya que ayuda a identificar qué tan diferentes o parecidos son dos usuarios o ítems en función de la "distancia" entre sus valoraciones. La distancia euclídea es inversamente proporcional a la similitud: cuanto menor es la distancia, mayor es la similitud.
@@ -237,10 +225,9 @@ La función `similitud_euclidea(usuario1, usuario2)` mide la similitud entre dos
 
 ### pearson.py
 ```bash
-
 def pearson (i, j):
   """
-    Calcula la correlación de Pearson entre dos listas de calificaciones.
+    Calcula la correlación de Pearson entre dos listas de valoraciones.
     
     Args:
         i (list): Lista de calificaciones del primer usuario.
@@ -289,15 +276,23 @@ Se define la función pearson, que calcula la correlación de Pearson entre dos 
 
 
 ### recomendador.py
-```bash 
 
+Este código implementa un sistema de recomendación utilizando **filtrado colaborativo** mediante tres métricas de similitud: **coseno**, **euclídea** y **correlación de Pearson**. Se describe a continuación las principales funciones. 
+
+**FUNCIONES PRINCIPALES Y FLUJO GENERAL**
+
+**`Importamos los métodos`**
+```python
 from cosine import coseno_similitud
 from euclidea import similitud_euclidea
 from pearson import pearson
 import argparse
+from colorama import Fore, Style, init
+```
+Importamos los métodos que desarrollamos para calcular las similitudes (`cosine`, `euclidea`, `pearson`), `argparse` para gestionar los parámetros por línea de comandos y `colorama` para poder darle color a la salida por consola.
 
-
-
+**`cargar_matriz_utilidad(archivo)`**
+```python
 def cargar_matriz_utilidad(archivo):
     """
     Carga la matriz de utilidad desde un archivo.
@@ -310,15 +305,18 @@ def cargar_matriz_utilidad(archivo):
     """
     with open(archivo, 'r') as f:
         # Las dos primeras filas del fichero las ignoramos
-        f.readline()
-        f.readline()
+        min_val = f.readline()
+        max_val = f.readline()
         matriz = [line.strip().split() for line in f.readlines()]
         # Convertir los elementos a float o mantener el "-" para faltantes
         matriz = [[float(x) if x != '-' else '-' for x in fila] for fila in matriz]
-    return matriz
+    return matriz, float(min_val), float(max_val)
+```
+   - Carga y procesa la matriz de utilidad desde un archivo, donde cada fila corresponde a un usuario y cada columna a un ítem.
+   - Convierte cada valor a `float`, manteniendo los valores faltantes como `"-"`.
 
-
-
+**`calcular_similitud_matriz(matriz, metrica)`**
+```python
 def calcular_similitud_matriz(matriz, metrica):
     """
     Calcula la similitud entre todos los usuarios usando la métrica elegida.
@@ -344,8 +342,14 @@ def calcular_similitud_matriz(matriz, metrica):
             matriz_similitud[i][j] = matriz_similitud[j][i] = sim
     
     return matriz_similitud
+```
+   - Calcula la **similitud** de cada usuario con el resto utilizando la métrica especificada:
+     - **coseno**: Utiliza la similitud de coseno para evaluar cuán similares son las preferencias de dos usuarios.
+     - **euclidea**: Calcula la distancia euclídea inversa, siendo más alta para usuarios con valoraciones cercanas.
+     - **pearson**: Mide la correlación lineal entre las valoraciones de dos usuarios.
 
-
+**`seleccionar_vecinos(similitudes, k)`**
+```python
 def seleccionar_vecinos(similitudes, k):
     """
     Selecciona los k vecinos más cercanos para cada usuario.
@@ -364,9 +368,13 @@ def seleccionar_vecinos(similitudes, k):
         # Seleccionar los k vecinos más cercanos
         vecinos.append([vecino[0] for vecino in vecinos_ordenados[:k]])
     return vecinos
+```
+   - Selecciona los `k` usuarios más similares para cada usuario en la matriz de similitud calculada.
+   - Ordena y selecciona los vecinos en función de los valores de similitud de mayor a menor.
 
-
-def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
+**`prediccion_simple(usuario, vecinos, matriz, similitudes, item, min_val)`**
+```python
+def prediccion_simple(usuario, vecinos, matriz, similitudes, item, min_val):
     """
     Predice la calificación faltante de un usuario para un ítem, usando predicción simple.
     
@@ -376,6 +384,8 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
         matriz (list): Matriz de utilidad con calificaciones de usuarios.
         similitudes (list): Matriz de similitud entre usuarios.
         item (int): Índice del ítem a predecir.
+        min_val (float): Valor mínimo de calificación.
+        max_val (float): Valor máximo de calificación.
     
     Returns:
         float: Predicción de la calificación.
@@ -388,10 +398,19 @@ def prediccion_simple(usuario, vecinos, matriz, similitudes, item):
                 numerador += similitudes[usuario][vecino] * matriz[vecino][item]
                 denominador += abs(similitudes[usuario][vecino])
     
-    return numerador / denominador if denominador != 0 else 0
+    if (denominador == 0):
+        return min_val        
+    return round((numerador / denominador), 2) if (numerador / denominador) >= min_val else min_val
 
+```
+   - Realiza una **predicción simple** de la calificación faltante para un usuario e ítem específicos.
+   - La predicción es un promedio ponderado de las valoraciones de los vecinos, donde los pesos son las similitudes entre los usuarios.
+   - Si la predicción es inferior al valor mínimo que puede tener una calificacion, se devuelve este valor mínimo.
+   - Redondea la prediccion a 2 decimales.
 
-def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
+**`prediccion_con_media(usuario, vecinos, matriz, similitudes, item)`**
+```python
+def prediccion_con_media(usuario, vecinos, matriz, similitudes, item, min_val):
     """
     Predice la calificación faltante de un usuario para un ítem, usando la diferencia con la media.
     
@@ -417,18 +436,33 @@ def prediccion_con_media(usuario, vecinos, matriz, similitudes, item):
                 denominador += abs(similitudes[usuario][vecino])
     
     if denominador == 0:
-        return media_usuario  # Evitar división por cero
+        return media_usuario  # Evitar división por cero)
     
-    return media_usuario + (numerador / denominador)
+    return round((media_usuario + (numerador / denominador)), 2) if (media_usuario + (numerador / denominador)) >= min_val else min_val
+```
+   - Realiza la **predicción basada en la diferencia con la media** de los usuarios.
+   - Considera la desviación de cada vecino respecto a su media, ajustando la predicción para que sea relativa a la media del usuario en cuestión.
+   - Si la predicción es inferior al valor mínimo que puede tener una calificacion, se devuelve este valor mínimo.
+   - Redondea la prediccion a 2 decimales.
 
+**`imprimir_resultados(matriz, matriz_similitud, vecinos, predicciones)`**
+```python
+# Inicializar colorama
+init()
 
-def imprimir_resultados(matriz, matriz_similitud, vecinos):
+def imprimir_resultados(matriz, matriz_similitud, vecinos, predicciones):
     """
     Imprime la matriz de utilidad con las predicciones, las similitudes y los vecinos seleccionados.
     """
     print("Matriz de utilidad con predicciones:")
-    for fila in matriz:
-        print(fila)
+    for i, fila in enumerate(matriz):
+        print("[", end=" ")
+        for j, valor in enumerate(fila):
+            if (i, j, valor) in predicciones:
+                print(Fore.RED + str(valor) + Style.RESET_ALL, end=" ")
+            else:
+                print(valor, end=" ")
+        print("]")
     
     print("\nMatriz de similitudes:")
     for fila in matriz_similitud:
@@ -438,16 +472,25 @@ def imprimir_resultados(matriz, matriz_similitud, vecinos):
     for i, v in enumerate(vecinos):
         print(f"Usuario {i}: Vecinos {v}")
 
+    print("\nPredicciones de valoraciones de usuarios:")
+    for usuario, item, prediccion in predicciones:
+        print(f"Usuario {usuario} - Ítem {item}: {prediccion}")
+```
+   - Imprime:
+     - La matriz de utilidad, incluyendo las predicciones generadas en color rojo.
+     - La matriz de similitudes entre usuarios.
+     - Los vecinos seleccionados para cada usuario.
+     - Las predicciones generadas con la métrica especificada.
 
-# EJEMPLO DE EJECUCION: python3 recomendador.py --archivo matriz.txt --metrica euclidea --vecinos 3 --tipo_prediccion media
-
+**`Función main()`**
+```python
 def main():
     # Configurar el analizador de argumentos
     parser = argparse.ArgumentParser(description='Sistema de recomendación basado en diferentes métricas y tipos de predicción.')
-    parser.add_argument('--archivo', type=str, required=True, help='Ruta al archivo de la matriz de utilidad')
-    parser.add_argument('--metrica', type=str, required=True, choices=['pearson', 'coseno', 'euclidea'], help='Métrica elegida: pearson, coseno o euclidea')
-    parser.add_argument('--vecinos', type=int, required=True, help='Número de vecinos considerado')
-    parser.add_argument('--tipo_prediccion', type=str, required=True, choices=['simple', 'media'], help='Tipo de predicción: simple o media')
+    parser.add_argument('-a', '--archivo', type=str, required=True, help='Ruta al archivo de la matriz de utilidad')
+    parser.add_argument('-m', '--metrica', type=str, required=True, choices=['pearson', 'coseno', 'euclidea'], help='Métrica elegida: pearson, coseno o euclidea')
+    parser.add_argument('-v', '--vecinos', type=int, required=True, help='Número de vecinos considerado')
+    parser.add_argument('-t', '--tipo_prediccion', type=str, required=True, choices=['simple', 'media'], help='Tipo de predicción: simple o media')
 
     # Parsear los argumentos
     args = parser.parse_args()
@@ -459,60 +502,35 @@ def main():
     tipo_prediccion = args.tipo_prediccion
 
     # Cargar la matriz de utilidad
-    matriz = cargar_matriz_utilidad(archivo)
+    matriz, min_val, max_val = cargar_matriz_utilidad(archivo)
+    
     # Calcular la matriz de similitud
     matriz_similitud = calcular_similitud_matriz(matriz, metrica)
     # Seleccionar los vecinos
     vecinos = seleccionar_vecinos(matriz_similitud, k)
+    # Lista para guardar únicamente las predicciones
+    predicciones = []
     
     # Predecir valores faltantes
     for usuario in range(len(matriz)):
         for item in range(len(matriz[usuario])):
             if matriz[usuario][item] == '-':
                 if tipo_prediccion == 'simple':
-                    matriz[usuario][item] = prediccion_simple(usuario, vecinos[usuario], matriz, matriz_similitud, item)
+                    matriz[usuario][item] = prediccion_simple(usuario, vecinos[usuario], matriz, matriz_similitud, item, min_val)
                 elif tipo_prediccion == 'media':
-                    matriz[usuario][item] = prediccion_con_media(usuario, vecinos[usuario], matriz, matriz_similitud, item)
-    
+                    matriz[usuario][item] = prediccion_con_media(usuario, vecinos[usuario], matriz, matriz_similitud, item, min_val)
+                predicciones.append((usuario, item, matriz[usuario][item]))
     # Imprimir los resultados
-    imprimir_resultados(matriz, matriz_similitud, vecinos)
+    imprimir_resultados(matriz, matriz_similitud, vecinos, predicciones)
 
 if __name__ == "__main__":
     main()
 ```
 
-Este código implementa un sistema de recomendación utilizando **filtrado colaborativo** mediante tres métricas de similitud: **coseno**, **euclídea** y **correlación de Pearson**. Se describe a continuación las principales funciones. 
-
-**FUNCIONES PRINCIPALES Y FLUJO GENERAL**
- 
-**`cargar_matriz_utilidad(archivo)`**
-   - Carga y procesa la matriz de utilidad desde un archivo, donde cada fila corresponde a un usuario y cada columna a un ítem.
-   - Convierte cada valor a `float`, manteniendo los valores faltantes como `"-"`.
-
-**`calcular_similitud_matriz(matriz, metrica)`**
-   - Calcula la **similitud** entre todos los usuarios de la matriz utilizando la métrica especificada:
-     - **coseno**: Utiliza la similitud de coseno para evaluar cuán similares son las preferencias de dos usuarios.
-     - **euclidea**: Calcula la distancia euclídea inversa, siendo más alta para usuarios con valoraciones cercanas.
-     - **pearson**: Mide la correlación lineal entre las valoraciones de dos usuarios.
-
-**`seleccionar_vecinos(similitudes, k)`**
-   - Selecciona los `k` usuarios más similares para cada usuario en la matriz de similitud calculada.
-   - Ordena y selecciona los vecinos en función de los valores de similitud de mayor a menor.
-
-**`prediccion_simple(usuario, vecinos, matriz, similitudes, item)`**
-   - Realiza una **predicción simple** de la calificación faltante para un usuario e ítem específicos.
-   - La predicción es un promedio ponderado de las valoraciones de los vecinos, donde los pesos son las similitudes entre los usuarios.
-
-**`prediccion_con_media(usuario, vecinos, matriz, similitudes, item)`**
-   - Realiza la **predicción basada en la diferencia con la media** de los usuarios.
-   - Considera la desviación de cada vecino respecto a su media, ajustando la predicción para que sea relativa a la media del usuario en cuestión.
-
-**`imprimir_resultados(matriz, matriz_similitud, vecinos)`**
-   - Imprime:
-     - La matriz de utilidad, incluyendo las predicciones generadas.
-     - La matriz de similitudes entre usuarios.
-     - Los vecinos seleccionados para cada usuario.
-
+    - En primer lugar se gestionan los argumentos que se pasan por línea de comandos.
+    - Se carga la matriz de utilidad y se calcula la matriz similitud y vecinos.
+    - Para aquellos items que un usuario no ha valorado, se calcula la predicción, se añade en la matriz utilidad y se guarda en una lista para imprimirla posteriormente. Nótese que el añadir la predicción a la matriz utilidad no afecta a predicciones posteriores puesto que ya se ha calculado la matriz similitud y la lista con los vecinos para todos los usuarios.
+    - Se imprimen los resultados.
 
 ## USO DEL PROGRAMA
 Este sistema puede ejecutarse en la terminal mediante:
