@@ -637,7 +637,7 @@ Usuario 9: Vecinos [0, 2, 6]
 Usuario 10: Vecinos [0, 2, 6]
 ```
 
-## Ejemplo 3 --> sando la métrica de similitud euclidea y tipo de predicción media.
+## Ejemplo 3 --> Usando la métrica de similitud euclidea y tipo de predicción media.
 ```bash
 python3 recomendador.py --archivo matriz.txt --metrica euclidea --vecinos 3 --tipo_prediccion media
 ```
@@ -779,4 +779,3 @@ Usuario 4: Vecinos [0, 3, 2]
 
 # Conclusión.
 En conclusión, el repositorio de GitHub incluye una guía completa donde se explican las dependencias necesarias, se revisa detalladamente el código desarrollado y se proponen ejemplos de uso práctico. Todo esto se ha estructurado para facilitar tanto la instalación como el entendimiento del software, permitiendo a los usuarios implementarlo y aprovechar sus funcionalidades de manera efectiva.
-
