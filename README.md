@@ -85,10 +85,11 @@ source entorno_recomendador/bin/activate
 
 Cuando el entorno esté activo, deberías ver (entorno_recomendador) antes del prompt de la terminal, indicando que estás en el entorno virtual.
 
-Con el entorno virtual activado, instala las bibliotecas necesarias para el sistema de recomendación utilizando pip. En el caso de este proyecto, la biblioteca a instalar es numpy:
+Con el entorno virtual activado, instala las bibliotecas necesarias para el sistema de recomendación utilizando pip. En el caso de este proyecto, las bibliotecas a instalar son numpy y colorama:
 
 ```bash
 pip install numpy
+pip install colorama
 ```
 
 Estas instrucciones permitirán configurar el entorno de Python en Linux e instalar las bibliotecas necesarias para el sistema de recomendación.
